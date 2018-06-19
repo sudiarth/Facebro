@@ -1,0 +1,47 @@
+{% extends 'base_facebro/index.html' %} {% block body %}
+<div class="container mt-5">
+    <div class="row justify-content-around">
+        <div class="col-4">
+            <h3>Already member</h3>
+            <hr>
+            <form action="{% url 'auth_facebro:signin' %}" method="POST">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Email address</label>
+                    <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputPassword1">Password</label>
+                    <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
+                </div>
+                <button type="submit" class="btn btn-outline-secondary">Signin</button>
+            </form>
+        </div>
+        <div class="col-4">
+            <h3>New member</h3>
+            <hr>
+            <form action="{% url 'auth_facebro:signup' %}" method="POST">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="email_signup">Name</label>
+                    <input type="text" name="html_name" class="form-control" id="email_signup" placeholder="Enter fullname">
+                </div>
+                <div class="form-group">
+                    <label for="email_signup">Email address</label>
+                    <input type="email" name="html_email" class="form-control" id="email_signup" aria-describedby="emailHelp" placeholder="Enter email">
+                    <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+                </div>
+                <div class="form-group">
+                    <label for="password_signup">Password</label>
+                    <input type="password" name="html_password" class="form-control" id="password_signup" placeholder="Password">
+                </div>
+                <div class="form-group">
+                    <label for="confirm_password_signup">Confirm Password</label>
+                    <input type="password" name="html_confirm" class="form-control" id="confirm_password_signup" placeholder="Password">
+                </div>
+                <button type="submit" class="btn btn-outline-secondary">Signup</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
