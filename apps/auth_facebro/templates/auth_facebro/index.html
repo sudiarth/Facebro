@@ -7,15 +7,18 @@
             <form action="{% url 'auth_facebro:signin' %}" method="POST">
                 {% csrf_token %}
                 <div class="form-group">
-                    <label for="exampleInputEmail1">Email address</label>
-                    <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
+                    <label for="email_signin">Email address</label>
+                    <input type="email" name="html_email" class="form-control" id="email_signin" placeholder="Enter email">
                 </div>
                 <div class="form-group">
-                    <label for="exampleInputPassword1">Password</label>
-                    <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
+                    <label for="password_signin">Password</label>
+                    <input type="password" name="html_password" class="form-control" id="password_signin" placeholder="Password">
                 </div>
                 <button type="submit" class="btn btn-outline-secondary">Signin</button>
             </form>
+            {% if request.session.error == 'signin' %}
+                {% include 'base_facebro/errors.html' %}
+            {% endif %}
         </div>
         <div class="col-4">
             <h3>New member</h3>
@@ -41,6 +44,9 @@
                 </div>
                 <button type="submit" class="btn btn-outline-secondary">Signup</button>
             </form>
+            {% if request.session.error == 'signup' %}
+                {% include 'base_facebro/errors.html' %}
+            {% endif %}
         </div>
     </div>
 </div>

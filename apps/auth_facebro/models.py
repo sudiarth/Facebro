@@ -14,7 +14,8 @@ class Profile(models.Model):
     image = models.CharField(max_length=64, null=True)
     is_active = models.IntegerField()
 
-    user = models.ForeignKey(User, related_name='profile_user', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name='user_profile', on_delete=models.CASCADE)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
