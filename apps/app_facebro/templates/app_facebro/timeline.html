@@ -18,19 +18,18 @@
                 </form>
                 <hr>
                 {% endif %}
-                {% if posts %}
                 {% for post in posts %}
                 <div class="card mb-3 post bg-light">
                     <div class="card-body bg-white">
                         <ul class="list-unstyled">
                             <li class="media">
-                                <img class="mr-3" src="{% static 'base_facebro/img/profile-blank.jpg' %}" width="48" alt="Generic placeholder image">
+                                <img class="mr-3" src="{{ post.user.get_avatar.image }}" width="48" alt="{{ post.user.name }}">
                                 <div class="media-body">
                                     <small class="text-muted float-right">{{ post.created_at }}</small>
                                     {% if post.user_id == post.following_id %}
-                                    <h5 class="mt-0 mb-1"><a href="{% url 'app_facebro:timeline' user_id=post.user.id %}">{{ post.user.name }}</a></h5>
+                                    <h5 class="mt-0 mb-1"><a href="{% url 'app_facebro:wall' user_id=post.user.id %}">{{ post.user.name }}</a></h5>
                                     {% else %}
-                                    <h5 class="mt-0 mb-1"><a href="{% url 'app_facebro:timeline' user_id=post.user.id %}">{{ post.user.name }}</a> > <a href="{% url 'app_facebro:timeline' user_id=post.following.id %}">{{ post.following.name }}</a></h5>
+                                    <h5 class="mt-0 mb-1"><a href="{% url 'app_facebro:wall' user_id=post.user.id %}">{{ post.user.name }}</a> > <a href="{% url 'app_facebro:wall' user_id=post.following.id %}">{{ post.following.name }}</a></h5>
                                     {% endif %}
                                     <p class="float-none">{{ post.content }}</p>
                                 </div>
@@ -66,10 +65,10 @@
                     <ul class="list-unstyled p-3">
                         {% for comment in post.get_comment %}
                         <li class="media mt-2">
-                            <img class="mr-3" src="{% static 'base_facebro/img/profile-blank.jpg' %}" width="32" alt="Generic placeholder image">
+                            <img class="mr-3" src="{{ comment.user.get_avatar.image }}" width="32" alt="Generic placeholder image">
                             <div class="media-body">
                                 <small class="text-muted float-right">{{ comment.created_at }}</small>
-                                <h6 class="mt-0 mb-1"><a href="{% url 'app_facebro:timeline' user_id=comment.user.id %}">{{ comment.user.name }}</a></ >
+                                <h6 class="mt-0 mb-1"><a href="{% url 'app_facebro:wall' user_id=comment.user.id %}">{{ comment.user.name }}</a></h6>
                                 <p class="float-none">{{ comment.content }}</p>
                                 {% if request.session.user_id == comment.user.id %}
                                 <footer class="blockquote-footer float-left">
@@ -81,17 +80,7 @@
                         {% endfor %}
                     </ul>
                     {% endif %}
-                </div> {% endfor %} {% else %}
-                <div class="alert alert-warning mt-3" role="alert">
-                    {% if request.session.id == user.id %}
-                    <h4 class="alert-heading">Dude!!!</h4>
-                    <p class="mb-0">You has no post</p>
-                    {% else %}
-                    <h4 class="alert-heading">Sorry!!!</h4>
-                    <p class="mb-0">This user has no post</p>
-                    {% endif %}
-                </div>
-                {% endif %}
+                </div> {% endfor %}
             </div>
         </div>
     </div>

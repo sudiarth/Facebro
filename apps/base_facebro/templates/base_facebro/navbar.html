@@ -13,16 +13,17 @@
                 </li>
                 {% if request.session.name %}
                 <li class="nav-item active">
-                    <a class="nav-link" href="{% url 'app_facebro:timeline' user_id=request.session.user_id %}">Timeline
+                    <a class="nav-link" href="{% url 'app_facebro:timeline' %}">Timeline
                         <span class="sr-only">(current)</span>
                     </a>
                 </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true"
                         aria-expanded="false">
-                        {{ request.session.name }}
+                        <i class="fa fa-user-circle"></i> {{ request.session.name }}
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="{% url 'app_facebro:wall' user_id=request.session.user_id %}">Profile</a>
                         <a class="dropdown-item" href="{% url 'app_facebro:setting' %}">Settings</a>
                         <div class="dropdown-divider"></div>
                         <a class="dropdown-item" href="{% url 'auth_facebro:signout' %}">Signout</a>

@@ -8,8 +8,12 @@ app_name = 'app_facebro'
 
 urlpatterns = [
     path('', views.index, name='index'),
-    path('user/<int:user_id>/timeline', views.timeline, name='timeline'),
+    path('timeline', views.timeline, name='timeline'),
+    path('user/<int:user_id>/wall', views.wall, name='wall'),
     path('settings', views.setting, name='setting'),
+    path('profile/update', views.profile_update, name='profile_update'),
+    path('profile/upload', views.profile_upload, name='profile_upload'),
+    path('password/update', views.password_update, name='password_update'),
     path('user/<int:user_id>/post', views.post_create, name='post_create'),
     path('post/<int:post_id>/delete', views.post_delete, name='post_delete'),
     path('user/<int:user_id>/following', views.following, name='following'),

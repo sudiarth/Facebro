@@ -9,6 +9,10 @@ class User(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    @property
+    def get_avatar(self):
+        return self.user_profile.get(is_active=1)
+
 class Profile(models.Model):
     
     image = models.CharField(max_length=64, null=True)
@@ -18,4 +22,3 @@ class Profile(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-

@@ -8,18 +8,36 @@ from django.core.files.storage import FileSystemStorage
 
 from django.db.models import Q
 from django.http import HttpRequest
-from apps.auth_facebro.models import User
+from apps.auth_facebro.models import User, Profile
+from apps.auth_facebro import utilities as util
+
 from . import models as m
 
 def index(request):
     if 'user_id' in request.session:
-        return redirect('app_facebro:timeline', user_id=request.session['user_id'])
+        return redirect('app_facebro:wall', user_id=request.session['user_id'])
     
     return render(request, 'app_facebro/index.html')
 
-def timeline(request, user_id):
+def timeline(request):
     if 'user_id' not in request.session:
-        return redirect('auth_facebro:timeline', user_id=request.session['user_id'])
+        return redirect('auth_facebro:index')
+
+    try:
+        posts = m.Post.objects.filter(Q(following_id=request.session['user_id']) | Q(user_id=request.session['user_id'])).order_by('-created_at')
+    except:
+        pass
+
+    context = {
+        'user': User.objects.get(id=request.session['user_id']),
+        'posts': posts
+    }
+
+    return render(request, 'app_facebro/timeline.html', context)
+
+def wall(request, user_id):
+    if 'user_id' not in request.session:
+        return redirect('auth_facebro:index')
 
     try:
 
@@ -42,11 +60,11 @@ def timeline(request, user_id):
 
         context = {
             'user' : [],
-            'followed' : followed,
+            'followed' : [],
             'posts' : []
         }
 
-    return render(request, 'app_facebro/timeline.html', context)
+    return render(request, 'app_facebro/wall.html', context)
 
 def comment_post(request, post_id):
     if 'user_id' not in request.session:
@@ -86,12 +104,133 @@ def setting(request):
         return redirect('auth_facebro:index')
 
     user = User.objects.get(id=request.session['user_id'])
+    photos = Profile.objects.filter(user_id=request.session['user_id'])
 
     context = {
-        'user': user
+        'user': user,
+        'photos': photos
     }
 
     return render(request, 'app_facebro/setting.html', context)
+
+def profile_upload(request):
+
+    if 'user_id' not in request.session:
+        return redirect('auth_facebro:index')
+
+    if request.method == 'POST' and request.FILES['file']:
+        
+        myfile = request.FILES['file']
+
+        fs = FileSystemStorage()
+        filename = fs.save(str(uuid.uuid4())+'.'+myfile.name.split('.')[-1], myfile)
+        uploaded_file_url = fs.url(filename)
+
+        try:
+            request.session['error'] = ''
+
+            profile = Profile()
+            profile.image = uploaded_file_url
+            profile.is_active = 1
+            profile.user_id = request.session['user_id']
+            profile.save()
+
+            request.session['error'] = 'profile_upload'
+
+            messages.error(request, 'Profile photo uploaded')
+
+            return redirect('app_facebro:setting')
+        except:
+            messages.error(request, 'Profile upload error')
+
+    return redirect('app_facebro:setting')
+
+def profile_update(request):
+
+    if 'user_id' not in request.session:
+        return redirect('auth_facebro:index')
+
+    if request.method == 'POST':
+
+        request.session['error'] = ''
+
+        name = request.POST['html_name']
+        email = request.POST['html_email']
+
+        errors = []
+        errors += util.is_blank('name', name)
+        errors += util.is_blank('email', email)
+
+        if not util.EMAIL_REGEX.match(email):
+            errors.append('Email formated error')
+
+        for error in errors:
+            messages.error(request, error)
+
+        request.session['error'] = 'profile_update'
+
+        if len(errors) == 0:
+
+            try:
+            
+                user = User.objects.get(id=request.session['user_id'])
+                user.name = name
+                user.email = email
+                user.save()
+
+                request.session['user_id'] = user.id
+                request.session['name'] = user.name
+
+                messages.error(request, 'Update profile success')
+
+            except:
+
+                messages.error(request, 'Update profile error')
+
+    return redirect('app_facebro:setting')
+
+def password_update(request):
+
+    if 'user_id' not in request.session:
+        return redirect('auth_facebro:index')
+
+    if request.method == 'POST':
+
+        request.session['error'] = ''
+
+        password = request.POST['html_password']
+        confirm = request.POST['html_confirm']
+
+        errors = []
+
+        errors += util.is_blank('password', password)
+        errors += util.is_blank('confirm', confirm)
+
+        if password != confirm:
+            errors.append('Password doesn\'t match')
+        if len(password) < 6:
+            errors.append('Password too short')
+
+        for error in errors:
+            messages.error(request, error)
+
+        request.session['error'] = 'password_update'
+
+        if len(errors) == 0:
+
+            try:
+            
+                user = User.objects.get(id=request.session['user_id'])
+                user.password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+                user.save()
+
+                messages.error(request, 'Update profile success')
+
+            except:
+
+                messages.error(request, 'Update profile error')
+
+    return redirect('app_facebro:setting')
 
 def follower(request, user_id):
 
@@ -202,13 +341,14 @@ def photo(request, user_id):
     return render(request, 'app_facebro/photos.html', context)
 
 def photo_create(request):
+    if 'user_id' not in request.session:
+        return redirect('auth_facebro:index')
+
     if request.method == 'POST' and request.FILES['file']:
         
         myfile = request.FILES['file']
         caption = request.POST['caption']
         user_id = request.session['user_id']
-
-        print(uuid.uuid4())
 
         fs = FileSystemStorage()
         filename = fs.save(str(uuid.uuid4())+'.'+myfile.name.split('.')[-1], myfile)
@@ -254,7 +394,7 @@ def post_create(request, user_id):
             post.following_id = user_id
             post.save()
 
-            return redirect('app_facebro:timeline', user_id=user_id)
+            return redirect('app_facebro:wall', user_id=user_id)
 
         except:
             messages.error(request, 'Create post error')
@@ -277,13 +417,19 @@ def post_delete(request, post_id):
 
 def search(request):
 
+    if 'user_id' not in request.session:
+        return redirect('auth_facebro:index')
+
     if request.method == 'POST':
 
         return redirect('app_facebro:results', query=request.POST['html_query'])
 
-    return redirect('app_facebro:timeline')
+    return redirect('app_facebro:wall')
 
 def results(request, query):
+
+    if 'user_id' not in request.session:
+        return redirect('auth_facebro:index')
 
     results = User.objects.filter(Q(name__icontains=query) | Q(email__icontains=query)).exclude(id=request.session['user_id']).all()
     user = User.objects.get(id=request.session['user_id'])
