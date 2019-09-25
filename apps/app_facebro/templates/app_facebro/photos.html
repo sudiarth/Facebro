@@ -1,0 +1,66 @@
+{% extends 'base_facebro/index.html' %} {% block body %}
+<div class="container mt-5">
+    <div class="row">
+        {% include 'app_facebro/sidebar.html' %}
+        <div class="col-md-8">
+            <div class="col-lg-12">
+                <h1>Photos</h1>
+                <hr>
+            </div>
+            <div class="col-lg-12">
+                {% if request.session.user_id == user.id %}
+                <form method="POST" action="{% url 'app_facebro:photo_create' %}" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="form-row">
+                        <div class="col-md-4 mb-3">
+                            <div class="text-center">
+                                <img id="preview" src="/static/base_facebro/img/profile_blank.jpg" width="180" class="rounded" alt="...">
+                            </div>
+                        </div>
+                        <div class="col-md-8 mb-3">
+                            <div class="form-group">
+                                <input type="text" class="form-control" name="caption" placeholder="Caption" required>
+                            </div>
+                            <div class="custom-file">
+                                <input type="file" name="file" class="custom-file-input" id="file_photo" required>
+                                <label class="custom-file-label" for="file_photo">Choose file...</label>
+                                <div class="invalid-feedback">Example invalid custom file feedback</div>
+                            </div>
+                            <button class="btn btn-primary mt-3" type="submit">Submit</button>
+                        </div>
+                    </div>
+                </form>
+                <hr>
+                {% endif %}
+                {% if photos %}
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="card-columns">
+                            {% for photo in photos %}
+                            <div class="card">
+                                <img class="card-img-top" src="{{ photo.src }}" alt="Card image cap">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ photo.caption }}</h5>
+                                    <a href="{% url 'app_facebro:photo_delete' photo_id=photo.id %}" class="btn btn-danger btn-sm">Delete</a>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="alert alert-warning mt-3" role="alert">
+                    {% if request.session.user_id == photo.user_id %}
+                    <h4 class="alert-heading">Dude!!!</h4>
+                    <p class="mb-0">You has no photos</p>
+                    {% else %}
+                    <h4 class="alert-heading">Sorry!!!</h4>
+                    <p class="mb-0">This user has no photos</p>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

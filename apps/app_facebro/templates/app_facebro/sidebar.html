@@ -1,0 +1,24 @@
+{% load static %}
+<div class="col col-lg-2">
+        <img src="{{ user.get_avatar.image }}" width="128" class="rounded mx-auto d-block" alt="{{ user.name }}">
+    <h3 class="text-center mt-3">{{ user.name }}</h3>
+    <ul class="list-group list-group-flush">
+        <li class="list-group-item">
+            <a href="{% url 'app_facebro:wall' user_id=user.id %}" class="text-secondary"><i class="fa fa-comments"></i> Wall</a>
+        </li>
+        <li class="list-group-item">
+            <a href="{% url 'app_facebro:following' user_id=user.id %}" class="text-secondary"><i class="fa fa-user"></i> Following</a>
+        </li>
+        <li class="list-group-item">
+            <a href="{% url 'app_facebro:follower' user_id=user.id %}" class="text-secondary"><i class="fa fa-user"></i> Follower</a>
+        </li>
+        <li class="list-group-item">
+            <a href="{% url 'app_facebro:photo' user_id=user.id %}" class="text-secondary"><i class="fa fa-photo"></i> Photos</a>
+        </li>
+        {% if request.session.user_id != user.id %}
+        <li class="list-group-item text-center">
+            <a href="" class="btn btn-primary btn-lg">FOLLOW</a>
+        </li>
+        {% endif %}
+    </ul>
+</div>

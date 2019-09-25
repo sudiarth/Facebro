@@ -1,0 +1,85 @@
+{% extends 'base_facebro/index.html' %} {% block body %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-lg-8 offset-2">
+            <h1>Settings</h1>
+            <hr>
+            <div class="form-row">
+                <div class="col-md-4 mb-3">
+                    <div class="text-center">
+                        <img id="preview" src="/static/base_facebro/img/profile_blank.jpg" width="180" class="rounded" alt="...">
+                    </div>
+                </div>
+                <div class="col-md-8 mb-3">
+                    <form method="POST" action="{% url 'app_facebro:profile_upload' %}" enctype="multipart/form-data" class="mb-3">
+                        {% csrf_token %}
+                        <h5>Upload photo</h5>
+                        {% if request.session.error == 'profile_upload' %}
+                            {% include 'base_facebro/errors.html' %}
+                        {% endif %}
+                        <hr>
+                        <label for="profile_picture">Profile picture</label>
+                        <div class="custom-file mb-2">
+                            <input type="file" name="file" class="custom-file-input" id="file_photo" required>
+                            <label class="custom-file-label" for="file_photo">Choose file...</label>
+                            <div class="invalid-feedback">Example invalid custom file feedback</div>
+                        </div>
+                        <div class="form-group form-check">
+                            <input type="checkbox" class="form-check-input" id="exampleCheck1">
+                            <label class="form-check-label" for="exampleCheck1">Active</label>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Upload</button>
+                    </form>
+                    <hr>
+                    <div class="row">
+                        {% for photo in photos %}
+                        <div class="col-lg-3">
+                            <div class="card {% if photo.is_active == 1 %}border-primary{% endif %}">
+                                <img class="card-img-top" src="{{ photo.image }}" alt="[]">
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <hr>
+                    <h5>Personal Information</h5>
+                    {% if request.session.error == 'profile_update' %}
+                        {% include 'base_facebro/errors.html' %}
+                    {% endif %}
+                    <hr>
+                    <form method="POST" action="{% url 'app_facebro:profile_update' %}" class="mb-3">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="name_setting">Name</label>
+                            <input type="text" name="html_name" class="form-control" id="name_setting" value="{{ user.name }}">
+                        </div>
+                        <div class="form-group">
+                            <label for="email_setting">Email address</label>
+                            <input type="email" name="html_email" class="form-control" id="email_setting" value="{{ user.email }}">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Update profile</button>
+                    </form>
+                    <hr>
+                    <h5>Update Password</h5>
+                    {% if request.session.error == 'password_update' %}
+                        {% include 'base_facebro/errors.html' %}
+                    {% endif %}
+                    <hr>
+                    <form method="POST" action="{% url 'app_facebro:password_update' %}" class="mb-3">
+                        {% csrf_token %}
+                        <hr>
+                        <div class="form-group">
+                            <label for="password_setting">Password</label>
+                            <input type="password" name="html_password" class="form-control" id="password_setting" placeholder="Password">
+                        </div>
+                        <div class="form-group">
+                            <label for="confirm_setting">Confirm Password</label>
+                            <input type="password" name="html_confirm" class="form-control" id="confirm_setting" placeholder="Confirm Password">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Update password</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

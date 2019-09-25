@@ -1,0 +1,30 @@
+{% extends 'base_facebro/index.html' %} {% load static %} {% block body %}
+<div class="container mt-5">
+    <div class="row">
+        {% include 'app_facebro/sidebar.html' %}
+        <div class="col-lg-10">
+            <div class="col-lg-12">
+                <h1>Follower</h1>
+                <hr>
+            </div>
+            <div class="col-lg-12">
+                {% for follow in follower %}
+                <div class="media">
+                    <img class="mr-3" width="64" src="{{ follow.user.get_avatar.image }}" alt="{{ follow.user.name }}">
+                    <div class="media-body">
+                        <h5 class="mt-0"><a href="{% url 'app_facebro:timeline' user_id=follow.user.id %}">{% if request.session.user_id == follow.user.id %}You{% else %}{{ follow.user.name }}{% endif %}</a></h5>
+                        {% if not follow.user_id in followed %}
+                        {% if follow.user_id != request.session.user_id %}
+                        <a href="{% url 'app_facebro:follow' email=follow.user.email %}" class="btn btn-sm btn-success">Follow</a>
+                        {% endif %}
+                        {% else %}
+                        <a href="{% url 'app_facebro:unfollow' user_id=follow.user_id %}" class="btn btn-sm btn-warning">Unfollow</a>
+                        {% endif %}
+                    </div>
+                </div>
+                <hr>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endblock %}
