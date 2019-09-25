@@ -4,7 +4,7 @@
         {% include 'app_facebro/sidebar.html' %}
         <div class="col-md-10">
             <div class="col-md-8">
-                {% if user.id in followed %}
+                {% if request.session.user_id == user.id or user.id in followed %}
                 <form action="{% url 'app_facebro:post_create' user_id=user.id %}" method="POST">
                     {% csrf_token %}
                     <div class="card">
@@ -83,7 +83,7 @@
                     {% endif %}
                 </div> {% endfor %} {% else %}
                 <div class="alert alert-warning mt-3" role="alert">
-                    {% if request.session.id == user.id %}
+                    {% if request.session.user_id == user.id %}
                     <h4 class="alert-heading">Dude!!!</h4>
                     <p class="mb-0">You has no post</p>
                     {% else %}

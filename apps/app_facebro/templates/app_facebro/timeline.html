@@ -4,7 +4,7 @@
         {% include 'app_facebro/sidebar.html' %}
         <div class="col-md-10">
             <div class="col-md-8">
-                {% if user.id in followed %}
+                {% if request.session.user_id == user.id or user.id in followed %}
                 <form action="{% url 'app_facebro:post_create' user_id=user.id %}" method="POST">
                     {% csrf_token %}
                     <div class="card">
@@ -26,12 +26,21 @@
                                 <img class="mr-3" src="{{ post.user.get_avatar.image }}" width="48" alt="{{ post.user.name }}">
                                 <div class="media-body">
                                     <small class="text-muted float-right">{{ post.created_at }}</small>
-                                    {% if post.user_id == post.following_id %}
-                                    <h5 class="mt-0 mb-1"><a href="{% url 'app_facebro:wall' user_id=post.user.id %}">{{ post.user.name }}</a></h5>
+                                    {% if post.user_id == request.session.user_id %}
+                                        {% if post.user_id == post.following_id %}
+                                        <h5 class="mt-0 mb-1"><a href="{% url 'app_facebro:wall' user_id=post.user.id %}">{{ post.user.name }}</a></h5>
+                                        {% else %}
+                                        <h5 class="mt-0 mb-1"><a href="{% url 'app_facebro:wall' user_id=post.user.id %}">{{ post.user.name }}</a> > <a href="{% url 'app_facebro:wall' user_id=post.following.id %}">{{ post.following.name }}</a></h5>
+                                        {% endif %}
+                                        <p class="float-none">{{ post.content }}</p>
                                     {% else %}
-                                    <h5 class="mt-0 mb-1"><a href="{% url 'app_facebro:wall' user_id=post.user.id %}">{{ post.user.name }}</a> > <a href="{% url 'app_facebro:wall' user_id=post.following.id %}">{{ post.following.name }}</a></h5>
+                                        {% if post.user_id == post.following_id %}
+                                        <h5 class="mt-0 mb-1"><a href="{% url 'app_facebro:wall' user_id=post.user.id %}">{{ post.user.name }}</a></h5>
+                                        {% else %}
+                                        <h5 class="mt-0 mb-1"><a href="{% url 'app_facebro:wall' user_id=post.user.id %}">{{ post.user.name }}</a> > <a href="{% url 'app_facebro:wall' user_id=post.following.id %}">{{ post.following.name }}</a></h5>
+                                        {% endif %}
+                                        <p class="float-none">{{ post.content }}</p>
                                     {% endif %}
-                                    <p class="float-none">{{ post.content }}</p>
                                 </div>
                             </li>
                         </ul>
